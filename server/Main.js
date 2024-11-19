@@ -6,6 +6,7 @@ const dbconnect = require("./db/db");
 const router = require("./router/ROute");
 const router2 = require("./router/usersroute");
 const v2 = require("cloudinary");
+const router3 = require("./router/postroutes");
 
 v2.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
 app.use("/clone/auth/v1", router);
 app.use("/clone/users/v1", router2);
+app.use("/clone/post/v1", router3);
 
 const server = () => {
   dbconnect();
