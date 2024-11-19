@@ -48,9 +48,18 @@ const likeunlikepost = async (req, res) => {
     const userlikedpost = Post.likes.include(userid);
     if (userlikedpost) {
       await Post.updateOne({ _id: postid }, { $pull: { likes: userid } });
+      await usermodel.updateOne(
+        { _id: userid },
+        { $pull: { likedpost: postid } }
+      );
+
       return res.json({ message: "Post unliked successfully" });
     } else {
       Post.likes.push(userid);
+      await usermodel.updateOne(
+        { _id: userid },
+        { $push: { likedpost: postid } }
+      );
       await Post.save();
       const notification = new notificarionmodel({
         from: userid,
@@ -114,4 +123,116 @@ const commentinpost = async (req, res) => {
   }
 };
 
-module.exports = { createpost, likeunlikepost, deleteost, commentinpost };
+const getallposts = async (req, res) => {
+  try {
+    const posts = await postmodel
+      .find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+    if (posts.length === 0) {
+      return res.status(200).json([]);
+    }
+    res.status(200).json(posts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getlikepost = async (req, res) => {
+  try {
+    const userid = req.user._id;
+    if (!userid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user = await usermodel.findById(userid);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const likedposts = await postmodel
+      .find({ _id: { $in: user.likedpost } })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+    res.status(200).json(likedposts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getfollowingpost = async (req, res) => {
+  try {
+    const userid = req.user._id;
+    if (!userid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const user = await usermodel.findById(userid);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const following = user.following;
+    const followingpost = await postmodel
+      .find({ user: { $in: following } })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+    res.status(200).json(followingpost);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getuserpost = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await usermodel.findOne(username);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const posts = await postmodel
+      .find({ user: user._id })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "user",
+        select: "-password",
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password",
+      });
+    res.status(200).json(posts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+module.exports = {
+  getuserpost,
+  getfollowingpost,
+  createpost,
+  likeunlikepost,
+  deleteost,
+  commentinpost,
+  getallposts,
+  getlikepost,
+};
