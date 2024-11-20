@@ -125,3 +125,42 @@ export const data = {
     },
   ],
 };
+
+export const notifications = [
+  {
+    _id: "1",
+    from: {
+      _id: "1",
+      username: "johndoe",
+      profileImg: "/images/profile1.png",
+    },
+    type: "follow",
+  },
+  {
+    _id: "2",
+    from: {
+      _id: "2",
+      username: "janedoe",
+      profileImg: "/images/profile2.png",
+    },
+    type: "like",
+  },
+  {
+    _id: "3",
+    from: {
+      _id: "3",
+      username: "alexsmith",
+      profileImg: "/images/profile3.png",
+    },
+    type: "follow",
+  },
+  {
+    _id: "4",
+    from: {
+      _id: "4",
+      username: "emilywhite",
+      profileImg: "/images/profile4.png",
+    },
+    type: "like",
+  },
+];

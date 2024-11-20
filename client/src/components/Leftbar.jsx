@@ -6,6 +6,7 @@ import { FcPortraitMode } from "react-icons/fc";
 import { LuLogOut } from "react-icons/lu";
 import defualt from "/prof.jpeg";
 import { Link } from "react-router-dom";
+
 const Leftbar = () => {
   return (
     <div className="flex font-semibold  border-cyan-600 flex-col items-center  h-[97vh] w-1/4 justify-between">
