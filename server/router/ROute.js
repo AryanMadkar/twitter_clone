@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/getme",protectroute ,getme)
-router.post("/signup", signup);
+router.post("/signup", signup );
 router.post("/login", login);
 router.post("/logoout", logout);
 
